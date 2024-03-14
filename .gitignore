@@ -3,3 +3,4 @@ vmlinuz
 *.iso
 *.efi
 *.0
+*.key
