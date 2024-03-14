@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.manifest.v1+json",
+  "artifactType": "application/vnd.unknown.artifact.v1",
+  "config": {
+    "mediaType": "application/vnd.oci.empty.v1+json",
+    "digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "size": 2,
+    "data": "e30="
+  },
+  "layers": [
+    {
+      "mediaType": "application/x-netboot-file+zstd",
+      "digest": "sha256:8c43de2ff0f29dc2f80d3002c1a98ad3a539099580e546c41f48378445fbe15e",
+      "size": 1449686,
+      "annotations": {
+        "org.opencontainers.image.title": "grubx64.efi",
+        "org.pulpproject.netboot.src.digest": "sha256:c3851ad903898dd128a9ab3c00ae12b7ecdbafb11d22428d2bb3f2d5b6ad2106",
+        "org.pulpproject.netboot.src.size": "3530048"
+      }
+    },
+    {
+      "mediaType": "application/x-netboot-file+zstd",
+      "digest": "sha256:d6a8779a6da3fd2d1bdd941ff60d27fa41dc315b28546019f3a4f07f65a27921",
+      "size": 105750491,
+      "annotations": {
+        "org.opencontainers.image.title": "initrd.img",
+        "org.pulpproject.netboot.src.digest": "sha256:31595ea8d8b400855031b224097a1cac4b2af79824aba3d32171adcd2bf4345a",
+        "org.pulpproject.netboot.src.size": "105748060"
+      }
+    },
+    {
+      "mediaType": "application/x-netboot-file+zstd",
+      "digest": "sha256:928b8e59bf6f2bc8c0b1ed578895e01b596bb5d59f72f18cdccd19fa92c07d73",
+      "size": 567167586,
+      "annotations": {
+        "org.opencontainers.image.title": "install.img",
+        "org.pulpproject.netboot.src.digest": "sha256:c50881f9170b53f88d3c142473d332aaf20606ce9cdb4a68be36ec1bdf7a16cf",
+        "org.pulpproject.netboot.src.size": "570699776"
+      }
+    },
+    {
+      "mediaType": "application/x-netboot-file+zstd",
+      "digest": "sha256:2b61163a0ecdf52cbfc77e9df2a735150d17c93f05a6e3e841fdde2e3e01a401",
+      "size": 41760,
+      "annotations": {
+        "org.opencontainers.image.title": "pxelinux.0",
+        "org.pulpproject.netboot.src.digest": "sha256:3efb9f54443d099237215b134c9c02c2c7e27ea286815b3d378827e91e4c4f36",
+        "org.pulpproject.netboot.src.size": "42600"
+      }
+    },
+    {
+      "mediaType": "application/x-netboot-file+zstd",
+      "digest": "sha256:ef39a23a8f545c647dd818f06ca3c9174de9c10333ff66d069a28c6290d9fb22",
+      "size": 377802,
+      "annotations": {
+        "org.opencontainers.image.title": "shim.efi",
+        "org.pulpproject.netboot.src.digest": "sha256:62bbc1295c118952b7db11690635f52929dafa384bc1e587f042916b121a6a56",
+        "org.pulpproject.netboot.src.size": "946712"
+      }
+    },
+    {
+      "mediaType": "application/x-netboot-file+zstd",
+      "digest": "sha256:0b96266721cc7a1edcd6058efff5c194b5a87b86e5ee07069a55a3b27486fc9a",
+      "size": 14312782,
+      "annotations": {
+        "org.opencontainers.image.title": "vmlinuz",
+        "org.pulpproject.netboot.src.digest": "sha256:5f2ef0de47f8d79d5ee9bf8b0ee6d5ba4d987c2f9a16b8b511a7c69e53931fe3",
+        "org.pulpproject.netboot.src.size": "14536168"
+      }
+    }
+  ],
+  "annotations": {
+    "org.pulpproject.netboot.altentrypoint": "grubx64.efi",
+    "org.pulpproject.netboot.entrypoint": "shim.efi",
+    "org.pulpproject.netboot.legacyentrypoint": "pxelinux.0",
+    "org.pulpproject.netboot.os.arch": "x86_64",
+    "org.pulpproject.netboot.os.name": "fedora",
+    "org.pulpproject.netboot.os.version": "39"
+  }
+}
