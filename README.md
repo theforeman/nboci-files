@@ -6,7 +6,7 @@ registry via [nboci](https://github.com/osbuild/nboci) utility.
 
 The repository is available at [quay.io/foreman/nboci-files](https://quay.io/repository/foreman/nboci-files).
 
-## Required utilities
+## Required utilities
 
 * [nboci](https://github.com/osbuild/nboci)
 * [cosign](https://github.com/sigstore/cosign)
@@ -95,3 +95,14 @@ In order to digitally sign any artifacts, you need to get `cosign.key` file and 
 
     cosign sign --key cosign.key -y quay.io/foreman/nboci-files:fedora-39-x86_64
 
+## Pulling files
+
+To verify digital signature and pull all files or files from specific tag, do:
+
+    nboci pull --destination /tmp/test -k cosign.pub quay.io/foreman/nboci-files:fedora-39-x86_64
+    downloading /tmp/test/fedora/39/x86_64/grubx64.efi
+    downloading /tmp/test/fedora/39/x86_64/initrd.img
+    downloading /tmp/test/fedora/39/x86_64/install.img
+    downloading /tmp/test/fedora/39/x86_64/pxelinux.0
+    downloading /tmp/test/fedora/39/x86_64/shim.efi
+    downloading /tmp/test/fedora/39/x86_64/vmlinuz
