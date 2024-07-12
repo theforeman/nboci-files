@@ -109,4 +109,4 @@ verify digital signature and pull all files or files from specific tag, do:
     downloading /tmp/test/fedora/39/x86_64/shim.efi
     downloading /tmp/test/fedora/39/x86_64/vmlinuz
 
-The utility checks file sha sums and only re-downloads files w hich are missing or corrupt.
+The utility checks file sha sums and only re-downloads files which are missing or corrupt.
