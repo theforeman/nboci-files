@@ -4,3 +4,5 @@ vmlinuz
 *.efi
 *.0
 *.key
+/work
+/test
