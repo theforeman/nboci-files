@@ -53,6 +53,16 @@ Multiple architectures can be added into one manifest. The required annotation `
 
 An example shell script for pushing Fedora AMD64 and ARM64 netboot files is in `push-fedora-40.sh` which can serve as a template for other Red Hat based operating systems. It is recommended to commit those build scripts into the git repository.
 
+## Naming conventions and requirements
+
+* Architecture dependant tag (content manifest): `distro-version-arch`
+* Architecture independant tag (index manifest): `distro-version`
+* Content manifest operating system must be set to `linux`
+* Content manifest operating system version must be set to `distro-version`
+* Architecture name must follow the [OCI image index specification](https://github.com/opencontainers/image-spec/blob/main/image-index.md) (GOARCH)
+* Both the content and the index manifests must have an annotation named `org.pulpproject.netboot.version` set to `1`
+* All files must be added with filename annotation `org.opencontainers.image.title` (this is the podman's default behavior)
+
 ## Pulling files
 
 Use the python script which calls `skopeo` command line utility to perform manifest fetching and content pulling:
@@ -75,7 +85,7 @@ options:
 
 For example the following command:
 
-./artifact-pull.py -d test quay.io/foreman/nboci-files
+    ./artifact-pull.py -d test quay.io/foreman/nboci-files
 
 Creates the following structure:
 
