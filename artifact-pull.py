@@ -3,8 +3,9 @@
 import os
 import json
 import os.path
+import argparse
 
-dry_run = True
+dry_run = False
 
 # {
 #     "Repository": "quay.io/lzapletal/nbp1",
@@ -60,9 +61,11 @@ def fetch_manifest(repo, tag, dst):
     manifest = os.popen(cmd).read()
     parsed = json.loads(manifest)
     if parsed['schemaVersion'] != 2:
-        raise Exception("Invalid schema version")
+        print("invalid schema version")
+        return
     if parsed['mediaType'] != "application/vnd.oci.image.index.v1+json":
-        raise Exception("Invalid media type")
+        print("invalid media type")
+        return
     
     for manifest in parsed['manifests']:
         if not 'annotations' in manifest or manifest['annotations']['org.pulpproject.netboot.version'] != "1":
@@ -75,16 +78,16 @@ def fetch_manifest(repo, tag, dst):
             raise Exception("Missing platform.architecture")
         digest = manifest['digest']
         cache_name = os.path.join(dst, digest.split(":")[1])
-        if os.path.exists(cache_name):
+        if not dry_run and os.path.exists(cache_name):
             print("manifest " + manifest['digest'] + " already downloaded")
-            if not dry_run:
-                continue
+            continue
         dir = os.path.join(dst, osver, arch)
         print("downloading manifest " + manifest['digest'] + " to " + dir)
         fetch_image(repo, digest, dir)
         manifest_cache = json.dumps(manifest, indent=4)
-        with open(cache_name, "w") as f:
-            f.write(manifest_cache)
+        if not dry_run:
+            with open(cache_name, "w") as f:
+                f.write(manifest_cache)
 
 # {
 #   "schemaVersion": 2,
@@ -114,9 +117,11 @@ def fetch_image(repo, tag, dst):
     manifest = os.popen(cmd).read()
     parsed = json.loads(manifest)
     if parsed['schemaVersion'] != 2:
-        raise Exception("Invalid schema version")
+        print("invalid schema version")
+        return
     if parsed['mediaType'] != "application/vnd.oci.image.manifest.v1+json":
-        raise Exception("Invalid media type")
+        print("invalid media type")
+        return
 
     os.makedirs(dst, exist_ok=True)
     cmd = "skopeo copy docker://" + repo + "@" + tag + " dir:" + dst
@@ -129,12 +134,25 @@ def fetch_image(repo, tag, dst):
         title = layer['annotations']['org.opencontainers.image.title']
         digest = layer['digest']
         digest_without_prefix = digest.split(":")[1]
-        if not os.path.exists(os.path.join(dst, title)):
+        if not dry_run and not os.path.exists(os.path.join(dst, title)):
             print("creating symlink " + title + " to " + digest_without_prefix)
             os.symlink(digest_without_prefix, os.path.join(dst, title))
 
-def main():
-    fetch_manifest("quay.io/lzapletal/nbp1", "fedora-40", "./test")
-
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description='Extract images from a container repository')
+    parser.add_argument('--dry-run', '-n', action='store_true', default=False, help='do not download anything')
+    parser.add_argument('--destination', '-d', metavar='DST', type=str, default=".", help='destination directory')
+    parser.add_argument('repository', metavar='REPOSITORY', type=str, help='repository name with or without tag')
+    args = parser.parse_args()
+    dry_run = args.dry_run
+    if not os.path.exists(args.destination):
+        os.makedirs(args.destination)
+    if ":" in args.repository:
+        repo = args.repository.split(":")[0]
+        tag = args.repository.split(":")[1]
+        fetch_manifest(repo, tag, args.destination)
+    else:
+        repo = args.repository
+        tags = list_tags(repo)
+        for tag in tags:
+            fetch_manifest(repo, tag, args.destination)
