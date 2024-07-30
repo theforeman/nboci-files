@@ -23,12 +23,13 @@ FROM quay.io/fedora/fedora-minimal:40 as builder
 ARG name=Fedora
 ARG version=40
 ARG arch=x64
+ARG baseurl=https://dl.fedoraproject.org/pub/fedora/linux
 WORKDIR /root
 
 # Artifacts from kickstart repository.
-RUN curl -RLO https://dl.fedoraproject.org/pub/fedora/linux/releases/${version}/Everything/$(uname -m)/os/images/pxeboot/vmlinuz
-RUN curl -RLO https://dl.fedoraproject.org/pub/fedora/linux/releases/${version}/Everything/$(uname -m)/os/images/pxeboot/initrd.img
-RUN curl -RLO https://dl.fedoraproject.org/pub/fedora/linux/releases/${version}/Everything/$(uname -m)/os/images/install.img
+RUN curl -RLO ${baseurl}/releases/${version}/Everything/$(uname -m)/os/images/pxeboot/vmlinuz
+RUN curl -RLO ${baseurl}/releases/${version}/Everything/$(uname -m)/os/images/pxeboot/initrd.img
+RUN curl -RLO ${baseurl}/releases/${version}/Everything/$(uname -m)/os/images/install.img
 
 # Artifacts from RPM repository.
 RUN microdnf -y install shim-${arch} grub2-efi-${arch} syslinux-tftpboot
