@@ -54,6 +54,106 @@ Multiple architectures can be added into one manifest. The required annotation `
 
 An example shell script for pushing Fedora AMD64 and ARM64 netboot files is in `push-fedora-40.sh` which can serve as a template for other Red Hat based operating systems. It is recommended to commit those build scripts into the git repository.
 
+This creates a manifest index with one or more architectures:
+
+```
+$ skopeo inspect --raw docker://quay.io/lzapletal/nbp1:fedora-40
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.index.v1+json",
+  "manifests": [
+    {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:d558dd9ddc566e6c6c2a43a59a63f4f07d48135a383dbeff41c8e5cc64693e08",
+      "size": 1508,
+      "annotations": {
+        "org.pulpproject.netboot.version": "1"
+      },
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux",
+        "os.version": "fedora-40"
+      }
+    },
+    {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:333146267ae2411eecde5fdaabb992e309b1114c271fb53472a56e52c7eaaa96",
+      "size": 1310,
+      "annotations": {
+        "org.pulpproject.netboot.version": "1"
+      },
+      "platform": {
+        "architecture": "arm64",
+        "os": "linux",
+        "os.version": "fedora-40"
+      }
+    }
+  ]
+}
+```
+
+With content manifest with something like:
+
+```
+$ skopeo inspect --raw docker://quay.io/lzapletal/nbp1:fedora-40-amd64
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.index.v1+json",
+  "manifests": [
+    {
+      "mediaType": "application/vnd.oci.image.manifest.v1+json",
+      "digest": "sha256:d558dd9ddc566e6c6c2a43a59a63f4f07d48135a383dbeff41c8e5cc64693e08",
+      "size": 1508,
+      "annotations": {
+        "org.pulpproject.netboot.version": "1"
+      },
+      "platform": {
+        "architecture": "amd64",
+        "os": "linux",
+        "os.version": "fedora-40"
+      },
+      "artifactType": "application/vnd.unknown.artifact.v1"
+    }
+  ]
+}
+```
+
+Where the blob is:
+
+```
+{
+  "schemaVersion": 2,
+  "mediaType": "application/vnd.oci.image.manifest.v1+json",
+  "artifactType": "application/vnd.unknown.artifact.v1",
+  "config": {
+    "mediaType": "application/vnd.oci.empty.v1+json",
+    "digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "size": 2,
+    "data": "e30="
+  },
+  "layers": [
+    {
+      "mediaType": "application/octet-stream",
+      "digest": "sha256:a3b7052d7b2f27ff73c677fde7e16e8664a2151f5bb0e6ade3a392c59f913557",
+      "size": 3972416,
+      "annotations": {
+        "org.opencontainers.image.title": "grubx64.efi"
+      }
+    },
+    {
+      "mediaType": "application/vnd.efi.img",
+      "digest": "sha256:4723a6b6cf998f0571759569a18e390ba4be4df45dece95d0094a64f4e99a314",
+      "size": 618008576,
+      "annotations": {
+        "org.opencontainers.image.title": "install.img"
+      }
+    },
+
+    ...
+  ]
+}
+```
+
 ## Naming conventions and requirements
 
 * Architecture dependant tag (content manifest): `distro-version-arch`
