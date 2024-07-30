@@ -46,8 +46,9 @@ podman manifest add --annotation org.pulpproject.netboot.version=1 \
     --artifact quay.io/foreman/nboci-files:fedora-40-amd64 ./work/*
 podman manifest push quay.io/foreman/nboci-files:fedora-40-amd64
 
-podman manifest add --all --annotation org.pulpproject.netboot.version=1 quay.io/foreman/nboci-files:fedora-40 \
-    quay.io/foreman/nboci-files:fedora-40-amd64 \
+podman manifest add --all --annotation org.pulpproject.netboot.version=1 \
+    quay.io/foreman/nboci-files:fedora-40 \
+    quay.io/foreman/nboci-files:fedora-40-amd64
 ```
 
 Multiple architectures can be added into one manifest. The required annotation `org.pulpproject.netboot.version` must be present and set to `1`. Do not commit the files (e.g. `./work/*`) into the git repository.
