@@ -3,10 +3,12 @@
 OS=fedora
 OSVER=fedora-40
 WORKDIR=$PWD/work
+REPOSITORY=${REPOSITORY:-quay.io/foreman/nboci-files}
+TAG=$REPOSITORY-$OSVER
 
 # create image index and set the annotation at the index level
 # TODO set the artifactType at the index level https://github.com/containers/podman/issues/23598
-podman manifest create quay.io/foreman/nboci-files:$OSVER --annotation org.pulpproject.netboot.version=1
+podman manifest create "$TAG" --annotation org.pulpproject.netboot.version=1
 
 mkdir -p "$WORKDIR"
 VOLUME1=$(mktemp -d -p "$WORKDIR")
@@ -19,7 +21,7 @@ podman manifest add --annotation org.pulpproject.netboot.version=1 \
     --artifact \
     --artifact-type application/vnd.org.pulpproject.netboot.artifact.v1 \
     --artifact-layer-type application/x-netboot-file \
-    quay.io/foreman/nboci-files:$OSVER "$VOLUME1"/*
+    "$TAG" "$VOLUME1"/*
 
 VOLUME2=$(mktemp -d -p "$WORKDIR")
 podman build -v "${VOLUME2}:/root:Z" -f Containerfile-$OS-arm64 --platform linux/arm64
@@ -30,14 +32,14 @@ podman manifest add --annotation org.pulpproject.netboot.version=1 \
     --artifact \
     --artifact-type application/vnd.org.pulpproject.netboot.artifact.v1 \
     --artifact-layer-type application/x-netboot-file \
-    quay.io/foreman/nboci-files:$OSVER "$VOLUME2"/*
+    "$TAG" "$VOLUME2"/*
 
 rm -rf "$WORKDIR"
 
 # push image index containing netboot artifacts for different arches
-podman manifest push --all --rm quay.io/foreman/nboci-files:$OSVER
+podman manifest push --all --rm "$TAG"
 
 # tag child manifests
 # going to use skopeo for now https://github.com/containers/podman/issues/23599
 # Parse index image, find corresponding child manifests and tag them accordingly
-skopeo inspect docker://quay.io/foreman/nboci-files:$OSVER --raw |jq -r '.manifests.[] | "\(.platform.architecture) \(.digest)"' | while read -r i; do ARCH="$(echo "$i" | awk '{print $1}')"; DIGEST="$(echo "$i" | awk '{print $2}')" ; skopeo copy "docker://quay.io/foreman/nboci-files@${DIGEST}" "docker://quay.io/foreman/nboci-files:$OSVER-${ARCH}" ; done
+skopeo inspect "docker://$TAG" --raw |jq -r '.manifests.[] | "\(.platform.architecture) \(.digest)"' | while read -r i; do ARCH="$(echo "$i" | awk '{print $1}')"; DIGEST="$(echo "$i" | awk '{print $2}')" ; skopeo copy "docker://$REPOSITORY@${DIGEST}" "docker://$TAG-${ARCH}" ; done
