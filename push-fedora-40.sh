@@ -1,5 +1,7 @@
 #!/bin/bash
 
+shopt nullglob
+
 OS=fedora
 OSVER=fedora-40
 WORKDIR=$PWD/work
@@ -11,28 +13,20 @@ TAG=$REPOSITORY-$OSVER
 podman manifest create "$TAG" --annotation org.pulpproject.netboot.version=1
 
 mkdir -p "$WORKDIR"
-VOLUME1=$(mktemp -d -p "$WORKDIR")
 
-podman build -v "${VOLUME1}:/root:Z" -f Containerfile-$OS-amd64 --platform linux/amd64
+for containerfile in "Containerfile-$OS"-* ; do
+	ARCH=${containerfile##*-}
+	VOLUME=$(mktemp -d -p "${WORKDIR}")
+	podman build -v "${VOLUME}:/root:Z" -f "$containerfile" --platform "linux/$ARCH"
 
-# create and add netboot artifacts for amd64 to the image index
-podman manifest add --annotation org.pulpproject.netboot.version=1 \
-    --os linux --arch amd64 --os-version $OSVER \
-    --artifact \
-    --artifact-type application/vnd.org.pulpproject.netboot.artifact.v1 \
-    --artifact-layer-type application/x-netboot-file \
-    "$TAG" "$VOLUME1"/*
-
-VOLUME2=$(mktemp -d -p "$WORKDIR")
-podman build -v "${VOLUME2}:/root:Z" -f Containerfile-$OS-arm64 --platform linux/arm64
-
-# create and add netboot artifacts for arm64 to the image index
-podman manifest add --annotation org.pulpproject.netboot.version=1 \
-    --os linux --arch arm64 --os-version $OSVER \
-    --artifact \
-    --artifact-type application/vnd.org.pulpproject.netboot.artifact.v1 \
-    --artifact-layer-type application/x-netboot-file \
-    "$TAG" "$VOLUME2"/*
+	# create and add netboot artifacts to the image index
+	podman manifest add --annotation org.pulpproject.netboot.version=1 \
+	    --os linux --arch "$ARCH" --os-version $OSVER \
+	    --artifact \
+	    --artifact-type application/vnd.org.pulpproject.netboot.artifact.v1 \
+	    --artifact-layer-type application/x-netboot-file \
+	    "$TAG" "$VOLUME"/*
+done
 
 rm -rf "$WORKDIR"
 
