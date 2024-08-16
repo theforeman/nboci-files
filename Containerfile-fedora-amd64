@@ -1,6 +1,7 @@
-FROM quay.io/fedora/fedora-minimal:40 as builder
-ARG name=Fedora
 ARG version=40
+
+FROM quay.io/fedora/fedora-minimal:$version as builder
+ARG name=Fedora
 ARG arch=x64
 ARG baseurl=https://dl.fedoraproject.org/pub/fedora/linux
 WORKDIR /root

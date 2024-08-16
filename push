@@ -2,8 +2,9 @@
 
 shopt nullglob
 
-OS=fedora
-OSVER=fedora-40
+OS=${OS:-fedora}
+VERSION=${VERSION:-40}
+OSVER=$OS-$VERSION
 WORKDIR=$PWD/work
 REPOSITORY=${REPOSITORY:-quay.io/foreman/nboci-files}
 TAG=$REPOSITORY-$OSVER
@@ -17,11 +18,11 @@ mkdir -p "$WORKDIR"
 for containerfile in "Containerfile-$OS"-* ; do
 	ARCH=${containerfile##*-}
 	VOLUME=$(mktemp -d -p "${WORKDIR}")
-	podman build -v "${VOLUME}:/root:Z" -f "$containerfile" --platform "linux/$ARCH"
+	podman build -v "${VOLUME}:/root:Z" -f "$containerfile" --platform "linux/$ARCH" --build-arg "version=$VERSION"
 
 	# create and add netboot artifacts to the image index
 	podman manifest add --annotation org.pulpproject.netboot.version=1 \
-	    --os linux --arch "$ARCH" --os-version $OSVER \
+	    --os linux --arch "$ARCH" --os-version "$OSVER" \
 	    --artifact \
 	    --artifact-type application/vnd.org.pulpproject.netboot.artifact.v1 \
 	    --artifact-layer-type application/x-netboot-file \
