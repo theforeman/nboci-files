@@ -17,7 +17,7 @@ podman manifest add --annotation org.pulpproject.netboot.version=1 \
     --artifact \
     --artifact-type application/vnd.org.pulpproject.netboot.artifact.v1 \
     --artifact-layer-type application/x-netboot-file \
-    quay.io/foreman/nboci-files:$OSVER-amd64 ./work/*
+    quay.io/foreman/nboci-files:$OSVER ./work/*
 
 rm -f ./work/*
 podman build -v $(pwd)/work:/root:Z -f Containerfile-$OS-arm64 --platform linux/arm64
@@ -28,7 +28,7 @@ podman manifest add --annotation org.pulpproject.netboot.version=1 \
     --artifact \
     --artifact-type application/vnd.org.pulpproject.netboot.artifact.v1 \
     --artifact-layer-type application/x-netboot-file \
-    quay.io/foreman/nboci-files:$OSVER-arm64 ./work/*
+    quay.io/foreman/nboci-files:$OSVER ./work/*
 
 rm -rf ./work/
 # push image index containing netboot artifacts for different arches
