@@ -7,10 +7,11 @@ ARG baseurl=https://dl.fedoraproject.org/pub/fedora/linux
 WORKDIR /root
 
 # Artifacts from kickstart repository.
-RUN curl -RLO ${baseurl}/releases/${version}/Everything/$(uname -m)/os/images/pxeboot/vmlinuz
-RUN curl -RLO ${baseurl}/releases/${version}/Everything/$(uname -m)/os/images/pxeboot/initrd.img
-RUN curl -RLO ${baseurl}/releases/${version}/Everything/$(uname -m)/os/images/install.img
+RUN . /etc/os-release && curl --location --remote-name-all --remote-time \
+	${baseurl}/releases/${VERSION}/Everything/$(uname -m)/os/images/pxeboot/vmlinuz \
+	${baseurl}/releases/${VERSION}/Everything/$(uname -m)/os/images/pxeboot/initrd.img \
+	${baseurl}/releases/${VERSION}/Everything/$(uname -m)/os/images/install.img
 
 # Artifacts from RPM repository.
 RUN microdnf -y install shim-${arch} grub2-efi-${arch} syslinux-tftpboot
-RUN cp -p /tftpboot/pxelinux.0 . && cp -p /boot/efi/EFI/fedora/{shim,grub${arch}}.efi .
+RUN . /etc/os-release && cp -p /tftpboot/pxelinux.0 . && cp -p /boot/efi/EFI/${ID}/{shim,grub}${arch}.efi .
