@@ -40,4 +40,4 @@ podman manifest push --all --rm quay.io/foreman/nboci-files:$OSVER
 # tag child manifests
 # going to use skopeo for now https://github.com/containers/podman/issues/23599
 # Parse index image, find corresponding child manifests and tag them accordingly
-skopeo inspect docker://quay.io/foreman/nboci-files:$OSVER --raw |jq -r '.manifests.[] | "\(.platform.architecture) \(.digest)"' | while read i; do ARCH="$(echo $i | awk '{print $1}')"; DIGEST="$(echo $i | awk '{print $2}')" ; skopeo copy docker://quay.io/foreman/nboci-files@${DIGEST} docker://quay.io/foreman/nboci-files:$OSVER-${ARCH} ; done
+skopeo inspect docker://quay.io/foreman/nboci-files:$OSVER --raw |jq -r '.manifests.[] | "\(.platform.architecture) \(.digest)"' | while read -r i; do ARCH="$(echo "$i" | awk '{print $1}')"; DIGEST="$(echo "$i" | awk '{print $2}')" ; skopeo copy "docker://quay.io/foreman/nboci-files@${DIGEST}" "docker://quay.io/foreman/nboci-files:$OSVER-${ARCH}" ; done
