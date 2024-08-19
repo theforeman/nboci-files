@@ -20,7 +20,6 @@ Where the Containerfile looks like this:
 
 ```
 FROM quay.io/fedora/fedora-minimal:40 as builder
-ARG name=Fedora
 ARG version=40
 ARG arch=x64
 ARG baseurl=https://dl.fedoraproject.org/pub/fedora/linux
