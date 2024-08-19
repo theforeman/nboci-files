@@ -3,7 +3,7 @@ ARG version=stream9
 FROM quay.io/centos/centos:$version-minimal as builder
 ARG arch=aa64
 ARG baseurl=https://mirror.stream.centos.org
-WORKDIR /root
+WORKDIR /work
 
 # Artifacts from kickstart repository.
 RUN . /etc/os-release && curl --location --remote-name-all --remote-time \

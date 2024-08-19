@@ -14,7 +14,7 @@ The repository is available at [quay.io/foreman/nboci-files](https://quay.io/rep
 
 Fetch files from upstream repositories. Example for Fedora OS:
 
-    podman build -v $(pwd)/work:/root:Z -f Containerfile-fedora-amd64 --platform linux/amd64
+    podman build -v $(pwd)/work:/work:Z -f Containerfile-fedora-amd64 --platform linux/amd64
 
 Where the Containerfile looks like this:
 
@@ -23,7 +23,7 @@ FROM quay.io/fedora/fedora-minimal:40 as builder
 ARG version=40
 ARG arch=x64
 ARG baseurl=https://dl.fedoraproject.org/pub/fedora/linux
-WORKDIR /root
+WORKDIR /work
 
 # Artifacts from kickstart repository.
 RUN curl -RLO ${baseurl}/releases/${version}/Everything/$(uname -m)/os/images/pxeboot/vmlinuz

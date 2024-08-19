@@ -18,7 +18,7 @@ mkdir -p "$WORKDIR"
 for containerfile in "Containerfile-$OS"-* ; do
 	ARCH=${containerfile##*-}
 	VOLUME=$(mktemp -d -p "${WORKDIR}")
-	podman build -v "${VOLUME}:/root:Z" -f "$containerfile" --platform "linux/$ARCH" --build-arg "version=$VERSION"
+	podman build -v "${VOLUME}:/work:Z" -f "$containerfile" --platform "linux/$ARCH" --build-arg "version=$VERSION"
 
 	# create and add netboot artifacts to the image index
 	podman manifest add --annotation org.pulpproject.netboot.version=1 \
