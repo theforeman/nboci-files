@@ -14,17 +14,16 @@ The repository is available at [quay.io/foreman/nboci-files](https://quay.io/rep
 
 Fetch files from upstream repositories. Example for Fedora OS:
 
-    podman build -v $(pwd)/work:/root:Z -f Containerfile-fedora-amd64 --platform linux/amd64
+    podman build -v $(pwd)/work:/work:Z -f Containerfile-fedora-amd64 --platform linux/amd64
 
 Where the Containerfile looks like this:
 
 ```
 FROM quay.io/fedora/fedora-minimal:40 as builder
-ARG name=Fedora
 ARG version=40
 ARG arch=x64
 ARG baseurl=https://dl.fedoraproject.org/pub/fedora/linux
-WORKDIR /root
+WORKDIR /work
 
 # Artifacts from kickstart repository.
 RUN curl -RLO ${baseurl}/releases/${version}/Everything/$(uname -m)/os/images/pxeboot/vmlinuz
@@ -53,7 +52,14 @@ podman manifest add --all --annotation org.pulpproject.netboot.version=1 \
 
 Multiple architectures can be added into one manifest. The required annotation `org.pulpproject.netboot.version` must be present and set to `1`. Do not commit the files (e.g. `./work/*`) into the git repository.
 
-An example shell script for pushing Fedora AMD64 and ARM64 netboot files is in `push-fedora-40.sh` which can serve as a template for other Red Hat based operating systems. It is recommended to commit those build scripts into the git repository.
+This is integrated in the shell script `push`. By default it pushes Fedora 40, but can be used with other operating systems if there are Containerfiles.
+
+```console
+$ ./push
+$ OS=fedora VERSION=40 ./push # matches the previous line, but explicit
+$ OS=fedora VERSION=rawhide ./push
+$ OS=centos VERSION=stream9 ./push
+```
 
 This creates a manifest index with one or more architectures:
 

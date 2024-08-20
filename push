@@ -1,0 +1,40 @@
+#!/bin/bash
+
+shopt nullglob
+
+OS=${OS:-fedora}
+VERSION=${VERSION:-40}
+OSVER=$OS-$VERSION
+WORKDIR=$PWD/work
+REPOSITORY=${REPOSITORY:-quay.io/foreman/nboci-files}
+TAG=$REPOSITORY-$OSVER
+
+# create image index and set the annotation at the index level
+# TODO set the artifactType at the index level https://github.com/containers/podman/issues/23598
+podman manifest create "$TAG" --annotation org.pulpproject.netboot.version=1
+
+mkdir -p "$WORKDIR"
+
+for containerfile in "Containerfile-$OS"-* ; do
+	ARCH=${containerfile##*-}
+	VOLUME=$(mktemp -d -p "${WORKDIR}")
+	podman build -v "${VOLUME}:/work:Z" -f "$containerfile" --platform "linux/$ARCH" --build-arg "version=$VERSION"
+
+	# create and add netboot artifacts to the image index
+	podman manifest add --annotation org.pulpproject.netboot.version=1 \
+	    --os linux --arch "$ARCH" --os-version "$OSVER" \
+	    --artifact \
+	    --artifact-type application/vnd.org.pulpproject.netboot.artifact.v1 \
+	    --artifact-layer-type application/x-netboot-file \
+	    "$TAG" "$VOLUME"/*
+done
+
+rm -rf "$WORKDIR"
+
+# push image index containing netboot artifacts for different arches
+podman manifest push --all --rm "$TAG"
+
+# tag child manifests
+# going to use skopeo for now https://github.com/containers/podman/issues/23599
+# Parse index image, find corresponding child manifests and tag them accordingly
+skopeo inspect "docker://$TAG" --raw |jq -r '.manifests.[] | "\(.platform.architecture) \(.digest)"' | while read -r i; do ARCH="$(echo "$i" | awk '{print $1}')"; DIGEST="$(echo "$i" | awk '{print $2}')" ; skopeo copy "docker://$REPOSITORY@${DIGEST}" "docker://$TAG-${ARCH}" ; done
