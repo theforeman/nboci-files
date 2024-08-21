@@ -7,9 +7,9 @@ WORKDIR /work
 
 # Artifacts from kickstart repository.
 RUN . /etc/os-release && curl --location --remote-name-all --remote-time \
-	${baseurl}/releases/${VERSION}/Everything/$(uname -m)/os/images/pxeboot/vmlinuz \
-	${baseurl}/releases/${VERSION}/Everything/$(uname -m)/os/images/pxeboot/initrd.img \
-	${baseurl}/releases/${VERSION}/Everything/$(uname -m)/os/images/install.img
+	${baseurl}/releases/${VERSION_ID}/Everything/$(uname -m)/os/images/pxeboot/vmlinuz \
+	${baseurl}/releases/${VERSION_ID}/Everything/$(uname -m)/os/images/pxeboot/initrd.img \
+	${baseurl}/releases/${VERSION_ID}/Everything/$(uname -m)/os/images/install.img
 
 # Artifacts from RPM repository.
 RUN microdnf -y install shim-${arch} grub2-efi-${arch} syslinux-tftpboot
